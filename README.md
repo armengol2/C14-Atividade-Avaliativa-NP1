@@ -1,5 +1,4 @@
 ## C14-Atividade-Avaliativa-NP1
-# App de Finanças em Java
 
 ## Sobre o projeto
 Este projeto é um aplicativo de finanças desenvolvido em Java com foco no controle básico de entradas e saídas de dinheiro pelo terminal.
