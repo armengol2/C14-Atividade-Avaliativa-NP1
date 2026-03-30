@@ -1,4 +1,6 @@
 ## C14-Atividade-Avaliativa-NP1
+- Rodrigo Armengol de Oliveira
+- Pedro Henrique Oliveira Costa
 
 ## Sobre o projeto
 Este projeto é um aplicativo de finanças desenvolvido em Java com foco no controle básico de entradas e saídas de dinheiro pelo terminal.
