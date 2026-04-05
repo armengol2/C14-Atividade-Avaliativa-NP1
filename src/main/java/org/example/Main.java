@@ -1,75 +1,98 @@
 package org.example;
 import java.util.Scanner;
 
+import static org.example.ConsoleUtils.esperarEnter;
+
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         Carteira carteira = new Carteira();
         int opcao = -1;
 
+        System.out.println("==========================================");
+        System.out.println("     BEM-VINDO AO SEU APP DE FINANÇAS      ");
+        System.out.println("==========================================");
+
         while (opcao != 0) {
-            System.out.println("----- BEM VINDO A0 SEU APP DE FINANÇAS ----");
-            System.out.println("=== MENU ===");
-            System.out.println("Insira o seguinte número no menu para realizar sua opção...");
-            System.out.println("Adicionar receita -------->.1");
-            System.out.println("Adicionar despesa -------->.2");
-            System.out.println("Listar transações -------->.3");
-            System.out.println("Verificar saldo ---------->.4");
-            System.out.println("Remover uma transação ---->.5");
-            System.out.println("Fechar app --------------->.0");
-            System.out.print("Escolha uma opção-> ");
+            System.out.println("\n      === MENU ===    ");
+            System.out.println("[1] Adicionar Receita");
+            System.out.println("[2] Adicionar Despesa");
+            System.out.println("[3] Listar Transações");
+            System.out.println("[4] Verificar Saldo");
+            System.out.println("[5] Remover uma Transação");
+            System.out.println("[0] Sair do App");
+            System.out.println("-----------------------------");
+            System.out.print("Escolha uma opção: ");
+
             opcao = sc.nextInt();
             sc.nextLine();
-            if (opcao == 1) {
-                System.out.print("valor da receita-");
-                double valor = sc.nextDouble();
-                sc.nextLine();
 
-                System.out.print("descrição-");
-                String desc = sc.nextLine();
+            switch (opcao) {
+                case 1: {
+                    System.out.print("Insira o valor da receita: ");
+                    double valor = sc.nextDouble();
+                    sc.nextLine();
 
-                System.out.print("Insira a data(formato-00/00/0000)-");
-                String data = sc.nextLine();
+                    System.out.print("Insira a descrição da receita: ");
+                    String desc = sc.nextLine();
 
-                Receita receita = new Receita(valor, desc, data);
-                carteira.addTransacao(receita);
+                    System.out.print("Insira a data da receita(formato: 00/00/0000): ");
+                    String data = sc.nextLine();
 
-                System.out.println("Receita adicionada!");
-            }
-            else if (opcao == 2) {
-                System.out.print("valor da despesa- ");
-                double valor = sc.nextDouble();
-                sc.nextLine();
+                    Receita receita = new Receita(valor, desc, data);
+                    carteira.addTransacao(receita);
 
-                System.out.print("descrição- ");
-                String desc = sc.nextLine();
+                    System.out.println("Receita adicionada!");
+                    ConsoleUtils.esperarEnter(sc);
+                    break;
+                }
 
-                System.out.print("Insira a data(formato-00/00/0000)-");
-                String data = sc.nextLine();
+                case 2: {
+                    System.out.print("Insira o valor da despesa: ");
+                    double valor = sc.nextDouble();
+                    sc.nextLine();
 
-                Despesa despesa = new Despesa(valor, desc, data);
-                carteira.addTransacao(despesa);
+                    System.out.print("Insira o valor da despesa:  ");
+                    String desc = sc.nextLine();
 
-                System.out.println("Despesa adicionada!");
-            }
-            else if (opcao == 3) {
-                carteira.listTransacoes();
-            }
-            else if (opcao == 4) {
-                System.out.println("Saldo atual--> R$ " + carteira.saldo());
-            }
-            else if (opcao == 5) {
-                carteira.listTransacoes();
-                System.out.print("Insira o índice da transação que deseja remover-> ");
-                int indice = sc.nextInt();
-                sc.nextLine();
-                carteira.remTransacao(indice);
-            }
-            else if (opcao == 0) {
-                System.out.println("Obrigado por escolher nosso app, volte sempre:)");
-            }
-            else {
-                System.out.println("Sentimos muito, mas sua opção ainda não existe:(");
+                    System.out.print("Insira a data da despesa(formato: 00/00/0000): ");
+                    String data = sc.nextLine();
+
+                    Despesa despesa = new Despesa(valor, desc, data);
+                    carteira.addTransacao(despesa);
+
+                    System.out.println("Despesa adicionada!");
+                    ConsoleUtils.esperarEnter(sc);
+                    break;
+                }
+
+                case 3:
+                    carteira.listTransacoes();
+                    ConsoleUtils.esperarEnter(sc);
+                    break;
+
+                case 4:
+                    System.out.println("Seu saldo atual é de: R$" + carteira.saldo());
+                    ConsoleUtils.esperarEnter(sc);
+                    break;
+
+                case 5:
+                    carteira.listTransacoes();
+                    System.out.print("Insira o índice de transação que deseja remover: ");
+                    int indice = sc.nextInt();
+                    sc.nextLine();
+                    carteira.remTransacao(indice);
+                    ConsoleUtils.esperarEnter(sc);
+                    break;
+
+                case 0:
+                    System.out.println("Obrigado por escolher nosso app, volte sempre:)");
+                    break;
+
+                default:
+                    System.out.println("Opção inválida, tente novamente!");
+                    ConsoleUtils.esperarEnter(sc);
+                    break;
             }
         }
         sc.close();
