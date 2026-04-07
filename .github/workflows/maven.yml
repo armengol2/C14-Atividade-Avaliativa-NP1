@@ -13,10 +13,10 @@ jobs:
 
     steps:
       - name: Baixar codigo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Instalar JDK 22
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "22"
@@ -38,10 +38,10 @@ jobs:
 
     steps:
       - name: Baixar codigo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Instalar JDK 22
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "22"
@@ -60,7 +60,7 @@ jobs:
 
       - name: Salvar relatorio de testes
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: relatorio-testes
           path: target/surefire-reports/
@@ -73,10 +73,10 @@ jobs:
 
     steps:
       - name: Baixar codigo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Instalar JDK 22
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "22"
@@ -94,7 +94,7 @@ jobs:
         run: mvn -B -DskipTests package --file pom.xml
 
       - name: Salvar pacote como artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: finance-app-package
           path: target/*.jar
@@ -108,7 +108,7 @@ jobs:
 
     steps:
       - name: Baixar pacote gerado no build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: finance-app-package
           path: release
@@ -124,7 +124,7 @@ jobs:
           } > deploy/deploy-info.txt
 
       - name: Publicar deploy como artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: finance-app-deploy
           path: deploy/
