@@ -63,10 +63,10 @@ jobs:
 
   notification:
     runs-on: ubuntu-latest
-    needs: [deploy]
+    needs: [ deploy ]
     if: always()
     steps:
-      - name: Send Email Notification
+      - name: Enviar E-mail Real
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -74,9 +74,5 @@ jobs:
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
           to: ${{ secrets.EMAIL_DESTINO }}
-          from: "Pipeline GitHub <${{ secrets.MAIL_USERNAME }}>"
-          subject: "Status Pipeline: ${{ github.repository }}"
-          body: |
-            O pipeline foi concluído!
-            Status do Deploy: ${{ needs.deploy.result }}
-            Verifique os artefatos no GitHub Actions para o relatório e o pacote.
+          subject: "Status da Pipeline"
+          body: "A pipeline terminou com status: ${{ needs.deploy.result }}"
