@@ -1,0 +1,82 @@
+name: CI/CD Pipeline NP1
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Run Tests
+        run: mvn test
+
+      - name: Upload Test Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: target/surefire-reports/
+
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build Project
+        run: mvn package -DskipTests
+
+      - name: Upload Artifact (JAR)
+        uses: actions/upload-artifact@v4
+        with:
+          name: executable-package
+          path: target/*.jar
+
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [tests, build]
+    steps:
+      - name: Deploy Simulation
+        run: |
+          echo "Iniciando deploy automático..."
+          # Aqui entraria o script de instalação de software remoto
+          echo "Instalando dependências na máquina remota..."
+          # Exemplo: sudo apt-get install -y jre-headless
+
+
+  notification:
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: always()
+    steps:
+      - name: Send Email Notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          to: ${{ secrets.EMAIL_DESTINO }}
+          from: "Pipeline GitHub <${{ secrets.MAIL_USERNAME }}>"
+          subject: "Status Pipeline: ${{ github.repository }}"
+          body: |
+            O pipeline foi concluído!
+            Status do Deploy: ${{ needs.deploy.result }}
+            Verifique os artefatos no GitHub Actions para o relatório e o pacote.
