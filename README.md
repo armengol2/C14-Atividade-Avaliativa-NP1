@@ -55,4 +55,12 @@ Durante o desenvolvimento deste projeto, Inteligências Artificiais, como ChatGP
   Gemini, temos esse código de menu do nosso app de finanças e eu gostaria de mudar a lógica dele, transformando-a em uma estrutura switch. Também seria bom dar uma pequena modificada para deixá-lo mais ornamentado e polido em relação ao visual.
   ```
 - **Conclusão:** O Gemini trocou corretamente a lógica, que antes era baseada em if-else, para switch, sem apresentar problemas. Além disso, também deixou a parte visual mais bonita do que estava anteriormente. Alguns detalhes adicionados por nós foram mantidos, mas, no geral, o resultado ficou mais interessante e polido.
+
+#### Prompt 2
+- **Objetivo:** Trocar a lógica do menu de if-else para switch.
+- **Prompt utilizado:**
+  ```text
+  Gemini, temos esse código de menu do nosso app de finanças e eu gostaria de mudar a lógica dele, transformando-a em uma estrutura switch. Também seria bom dar uma pequena modificada para deixá-lo mais ornamentado e polido em relação ao visual.
+  ```
+- **Conclusão:** O Gemini trocou corretamente a lógica, que antes era baseada em if-else, para switch, sem apresentar problemas. Além disso, também deixou a parte visual mais bonita do que estava anteriormente. Alguns detalhes adicionados por nós foram mantidos, mas, no geral, o resultado ficou mais interessante e polido.
   
