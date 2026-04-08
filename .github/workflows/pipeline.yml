@@ -1,4 +1,4 @@
-name: CI/CD Pipeline NP1
+name: CI/CD Pipeline NP1 - Finance App
 
 on:
   push:
@@ -9,64 +9,76 @@ on:
 jobs:
 
   tests:
+    name: Execução de Testes
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup Java
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'maven'
 
-      - name: Run Tests
+      - name: Rodar Testes Unitários
         run: mvn test
 
-      - name: Upload Test Report
+      - name: Salvar Relatório de Testes (Artifact)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports
+          name: relatorio-testes
           path: target/surefire-reports/
 
 
   build:
+    name: Build e Empacotamento
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup Java
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'maven'
 
-      - name: Build Project
+      - name: Gerar Pacote JAR
         run: mvn package -DskipTests
 
-      - name: Upload Artifact (JAR)
+      - name: Salvar JAR (Artifact)
         uses: actions/upload-artifact@v4
         with:
-          name: executable-package
+          name: finance-app-jar
           path: target/*.jar
 
 
   deploy:
+    name: Deploy Automático
     runs-on: ubuntu-latest
     needs: [tests, build]
     steps:
-      - name: Deploy Simulation
+      - name: Simulação de Deploy e Instalação
         run: |
-          echo "Iniciando deploy automático..."
-          # Aqui entraria o script de instalação de software remoto
-          echo "Instalando dependências na máquina remota..."
-          # Exemplo: sudo apt-get install -y jre-headless
+          echo "Instalando dependências na máquina remota via script..."
+          # Exemplo de instalação solicitada no requisito:
+          # sudo apt-get update && sudo apt-get install -y openjdk-17-jre
+          echo "Realizando deploy do pacote..."
+          mkdir -p deploy_folder
+          echo "Deploy concluído com sucesso em $(date)" > deploy_folder/status.txt
 
 
   notification:
+    name: Notificação por E-mail
     runs-on: ubuntu-latest
-    needs: [ build, tests ]
-    if: always() 
+    needs: [tests, build, deploy]
+    if: always()
     steps:
-      - name: Enviar E-mail
+      - name: Enviar E-mail de Status
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -74,9 +86,14 @@ jobs:
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
           to: ${{ secrets.EMAIL_DESTINO }}
-          from: "Pipeline NP1"
-          subject: "Status da Pipeline NP1"
+          from: "GitHub Pipeline <${{ secrets.MAIL_USERNAME }}>"
+          subject: "Status Final da Pipeline NP1"
           body: |
-            A pipeline foi finalizada.
-            Build: ${{ needs.build.result }}
-            Testes: ${{ needs.tests.result }}
+            Olá! A execução da pipeline do projeto Finance App foi finalizada.
+
+            RESULTADOS:
+            - Testes Unitários: ${{ needs.tests.result }}
+            - Build/Empacotamento: ${{ needs.build.result }}
+            - Deploy Automático: ${{ needs.deploy.result }}
+
+            Verifique os artefatos no GitHub para baixar o JAR e os relatórios.
