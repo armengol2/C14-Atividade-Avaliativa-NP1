@@ -63,10 +63,10 @@ jobs:
 
   notification:
     runs-on: ubuntu-latest
-    needs: [ deploy ]
-    if: always()
+    needs: [ build, tests ]
+    if: always() 
     steps:
-      - name: Enviar E-mail Real
+      - name: Enviar E-mail
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -74,5 +74,9 @@ jobs:
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
           to: ${{ secrets.EMAIL_DESTINO }}
-          subject: "Status da Pipeline"
-          body: "A pipeline terminou com status: ${{ needs.deploy.result }}"
+          from: "Pipeline NP1"
+          subject: "Status da Pipeline NP1"
+          body: |
+            A pipeline foi finalizada.
+            Build: ${{ needs.build.result }}
+            Testes: ${{ needs.tests.result }}
