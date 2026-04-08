@@ -44,23 +44,12 @@ O projeto conta com **10 testes unitários (JUnit 5)** focados em fluxos de exce
 10. **Prevenção de Duplicidade:** Detecta e bloqueia transações idênticas em sequência (Anti-Spam).
 
 ## 🤖 Uso de Inteligência Artificial (IA)
-Este projeto foi desenvolvido com suporte de IA para apoio na arquitetura de QA, estruturação de testes e documentação.
+Durante o desenvolvimento deste projeto, ferramentas de Inteligência Artificial foram utilizadas como apoio para tirar dúvidas, estruturar testes, revisar partes da documentação e sugerir melhorias em boas práticas de desenvolvimento. Abaixo estão registrados os prompts utilizados e uma avaliação sobre sua utilidade.
 
-### Como a IA foi utilizada:
-- **Design de Casos de Teste:** Colaboração para identificar fluxos normais e fluxos de extensão.
-- **Estruturação de Testes:** Implementação de classes JUnit 5 seguindo boas práticas.
-- **Tratamento de Exceções:** Apoio na validação de cenários inválidos.
-- **Boas Práticas de Versionamento:** Orientação para uso de **Conventional Commits** e Git Flow.
-- **Edição do README:** Organização e refinamento da documentação do projeto.
+### Registro de Prompts
 
-### Exemplos de Prompts utilizados:
-> "Quais os fluxos de extensão mais comuns em um app de finanças para garantir dados limpos?"
-> "Como criar um teste unitário que valide se o usuário está tentando remover um índice inexistente?"
-> "Como estruturar testes de fluxo normal para Carteira, Receita, Despesa e Transação?"
-> "Atualize o README do projeto."
-
-## 🛠️ Tecnologias
-- **Java 17+**
-- **JUnit 5** (Testes Unitários)
-- **Maven** (Gerenciamento de dependências)
-- **Git/GitHub**
+#### Prompt 1
+- **Objetivo:** [preencher]
+- **Prompt utilizado:**
+  ```text
+  []
