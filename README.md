@@ -44,12 +44,12 @@ O projeto conta com **10 testes unitários (JUnit 5)** focados em fluxos de exce
 10. **Prevenção de Duplicidade:** Detecta e bloqueia transações idênticas em sequência (Anti-Spam).
 
 ## 🤖 Uso de Inteligência Artificial (IA)
-Durante o desenvolvimento deste projeto, ferramentas de Inteligência Artificial foram utilizadas como apoio para tirar dúvidas, estruturar testes, revisar partes da documentação e sugerir melhorias em boas práticas de desenvolvimento. Abaixo estão registrados os prompts utilizados e uma avaliação sobre sua utilidade.
+Durante o desenvolvimento deste projeto, Inteligências Artificiais, como ChatGPT, Gemini e outros, foram utilizadas como apoio para tirar dúvidas, estruturar testes, revisar partes da documentação e sugerir melhorias em boas práticas de desenvolvimento. Abaixo estão registrados os prompts utilizados e uma avaliação breve dos resultados.
 
 ### Registro de Prompts
 
 #### Prompt 1
-- **Objetivo:** [preencher]
+- **Objetivo:** [Trocar o menu da lógica If-Else para o Switch]
 - **Prompt utilizado:**
-  ```text
-  []
+  ```Gemini, temos esse código de menu do nosso app de finanças que eu gostaria de mudar a lógica dele e transforma-lo em uma regra switch, também seria bom em dar uma pequena modificada para deixa-lo mais ornamentado e polido em relação ao visual
+  [conclusão - O Gemini precisamente trocou a lógica, que antes era de if else, para switch sem mais problemas, além de deixar a parte visual mais bonita do que era anteriormente. Algumas detalhes adicionados por nós foram mantidos, mas em resumo, os detalhes ficaram bem mais interessantes e pólidos]
