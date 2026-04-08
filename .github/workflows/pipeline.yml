@@ -76,23 +76,25 @@ jobs:
   notification:
     name: Notificacao
     runs-on: ubuntu-latest
-    needs: [tests, build, deploy]
+    needs: [ tests, build, deploy ]
     if: always()
     steps:
-      - name: Script de Envio de E-mail
-        env:
-          MAIL_USER: ${{ secrets.MAIL_USERNAME }}
-          MAIL_PASS: ${{ secrets.MAIL_PASSWORD }}
-          MAIL_TO: ${{ secrets.EMAIL_DESTINO }}
-          TEST_STATUS: ${{ needs.tests.result }}
-          BUILD_STATUS: ${{ needs.build.result }}
-          DEPLOY_STATUS: ${{ needs.deploy.result }}
-        run: |
-          sudo apt-get update && sudo apt-get install -y swaks
-          swaks --server smtp.gmail.com --port 587 --auth LOGIN \
-            --auth-user "$MAIL_USER" --auth-password "$MAIL_PASS" \
-            --to "$MAIL_TO" \
-            --from "$MAIL_USER" \
-            --header "Subject: Relatorio Pipeline C14 - Inatel" \
-            --body "Pipeline Finalizada. Testes: $TEST_STATUS | Build: $BUILD_STATUS | Deploy: $DEPLOY_STATUS" \
-            --au "$MAIL_USER" --ap "$MAIL_PASS" -tlsc
+      - name: Enviar E-mail via Action (Estável)
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          to: ${{ secrets.EMAIL_DESTINO }}
+          from: "Pipeline NP1 Inatel"
+          subject: "Relatorio Pipeline C14 - Inatel"
+          priority: normal
+          body: |
+            A pipeline foi finalizada!
+            
+            Status dos Testes: ${{ needs.tests.result }}
+            Status do Build: ${{ needs.build.result }}
+            Status do Deploy: ${{ needs.deploy.result }}
+            
+            Confira os detalhes no link: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
