@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: Execução de Testes Unitários
+    name: Execução de Teste Unitário
     runs-on: ubuntu-latest
     steps:
       - name: Baixar codigo
