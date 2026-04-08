@@ -95,4 +95,4 @@ jobs:
             --from "$MAIL_USER" \
             --header "Subject: Relatorio Pipeline C14 - Inatel" \
             --body "Pipeline Finalizada. Testes: $TEST_STATUS | Build: $BUILD_STATUS | Deploy: $DEPLOY_STATUS" \
-            --tls
+            --au "$MAIL_USER" --ap "$MAIL_PASS" -tlsc
