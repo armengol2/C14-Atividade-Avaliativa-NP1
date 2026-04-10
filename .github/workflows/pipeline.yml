@@ -2,99 +2,313 @@ name: CI/CD Pipeline NP1 - Inatel C14
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
-#ínicio dos jobs
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  JAVA_VERSION: '22'
+
 jobs:
   tests:
-    name: Execução de Teste Unitário
+    name: Testes unitarios
     runs-on: ubuntu-latest
+
     steps:
       - name: Baixar codigo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
-      - name: Setup Java 22
-        uses: actions/setup-java@v5
+      - name: Configurar Java
+        uses: actions/setup-java@v4
         with:
-          java-version: '22'
-          distribution: 'temurin'
-          cache: 'maven'
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
 
-      - name: Rodar Testes
-        run: mvn test
+      - name: Executar testes
+        run: mvn -B clean test
 
-      - name: Armazenar Relatorio (Artifact)
+      - name: Publicar relatorio de testes
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: relatorio-testes
           path: target/surefire-reports/
+          if-no-files-found: warn
 
   build:
-    name: Build e Empacotamento
+    name: Build e empacotamento
     runs-on: ubuntu-latest
+
     steps:
       - name: Baixar codigo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
-      - name: Setup Java 22
-        uses: actions/setup-java@v5
+      - name: Configurar Java
+        uses: actions/setup-java@v4
         with:
-          java-version: '22'
-          distribution: 'temurin'
-          cache: 'maven'
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
 
-      - name: Gerar Pacote JAR
-        run: mvn package -DskipTests
+      - name: Gerar pacote JAR
+        run: mvn -B -DskipTests clean package
 
-      - name: Armazenar JAR (Artifact)
-        uses: actions/upload-artifact@v7
+      - name: Publicar JAR como artifact
+        uses: actions/upload-artifact@v4
         with:
           name: pacote-projeto
           path: target/*.jar
+          if-no-files-found: error
 
   deploy:
-    name: Deploy Automatico
+    name: Deploy no GitHub Pages
     runs-on: ubuntu-latest
     needs: [tests, build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
-      - name: Baixar Pacote (Artifact)
-        uses: actions/download-artifact@v8
+      - name: Baixar pacote gerado
+        uses: actions/download-artifact@v4
         with:
           name: pacote-projeto
+          path: dist
 
-      - name: Script de Instalacao e Deploy
+      - name: Preparar pagina para deploy
+        env:
+          BUILD_STATUS: ${{ needs.build.result }}
+          TEST_STATUS: ${{ needs.tests.result }}
+          COMMIT_SHA: ${{ github.sha }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_NUMBER: ${{ github.run_number }}
         run: |
-          echo "Preparando ambiente remoto..."
-          sudo apt-get update
-          # Usamos um comando simples que nao falha para garantir o critério de 'script'
-          echo "Software instalado com sucesso"
-          mkdir -p final_deploy
-          cp *.jar final_deploy/
+          set -euo pipefail
+
+          mkdir -p site/downloads
+
+          JAR_FILE="$(find dist -maxdepth 1 -name '*.jar' | head -n 1)"
+          if [ -z "$JAR_FILE" ]; then
+            echo "Nenhum arquivo JAR foi encontrado para o deploy." >&2
+            exit 1
+          fi
+
+          cp "$JAR_FILE" site/downloads/finance-app.jar
+          BUILD_DATE="$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+
+          cat <<EOF > site/index.html
+          <!DOCTYPE html>
+          <html lang="pt-BR">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>FinanceApp - Deploy automatico</title>
+            <style>
+              :root {
+                color-scheme: light;
+                --bg: #f3f7f5;
+                --panel: #ffffff;
+                --text: #1f2937;
+                --muted: #52606d;
+                --primary: #0f766e;
+                --primary-dark: #115e59;
+                --border: #d9e2ec;
+              }
+
+              * {
+                box-sizing: border-box;
+              }
+
+              body {
+                margin: 0;
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #ecfeff 0%, var(--bg) 55%, #fefce8 100%);
+                color: var(--text);
+              }
+
+              main {
+                max-width: 820px;
+                margin: 48px auto;
+                padding: 32px;
+                background: var(--panel);
+                border: 1px solid var(--border);
+                border-radius: 20px;
+                box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+              }
+
+              .badge {
+                display: inline-block;
+                margin-bottom: 18px;
+                padding: 6px 12px;
+                border-radius: 999px;
+                background: rgba(15, 118, 110, 0.12);
+                color: var(--primary-dark);
+                font-size: 0.9rem;
+                font-weight: 700;
+                letter-spacing: 0.03em;
+                text-transform: uppercase;
+              }
+
+              h1 {
+                margin: 0 0 12px;
+                font-size: clamp(2rem, 4vw, 3rem);
+              }
+
+              p {
+                line-height: 1.6;
+                color: var(--muted);
+              }
+
+              ul {
+                padding-left: 20px;
+                line-height: 1.8;
+              }
+
+              code {
+                padding: 2px 6px;
+                border-radius: 6px;
+                background: #e5e7eb;
+                color: #111827;
+              }
+
+              .actions {
+                margin: 28px 0;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+              }
+
+              .button {
+                display: inline-block;
+                padding: 12px 18px;
+                border-radius: 12px;
+                background: var(--primary);
+                color: #ffffff;
+                text-decoration: none;
+                font-weight: 700;
+              }
+
+              .button:hover {
+                background: var(--primary-dark);
+              }
+
+              .card {
+                margin-top: 24px;
+                padding: 20px;
+                border-radius: 16px;
+                background: #f8fafc;
+                border: 1px solid var(--border);
+              }
+            </style>
+          </head>
+          <body>
+            <main>
+              <span class="badge">Deploy automatico</span>
+              <h1>FinanceApp publicado pelo GitHub Actions</h1>
+              <p>
+                Este ambiente foi gerado automaticamente para deixar o resultado do projeto acessivel
+                apos a etapa de deploy da pipeline.
+              </p>
+
+              <div class="actions">
+                <a class="button" href="./downloads/finance-app.jar" download>Baixar arquivo JAR</a>
+              </div>
+
+              <div class="card">
+                <strong>Status da execucao</strong>
+                <ul>
+                  <li>Testes: $TEST_STATUS</li>
+                  <li>Build: $BUILD_STATUS</li>
+                  <li>Run da pipeline: #$RUN_NUMBER</li>
+                  <li>Commit: $COMMIT_SHA</li>
+                  <li>Gerado em: $BUILD_DATE</li>
+                  <li>Repositorio: $REPOSITORY</li>
+                </ul>
+              </div>
+
+              <div class="card">
+                <strong>Como executar localmente</strong>
+                <p>
+                  Depois de baixar o artefato, use um ambiente com Java ${{ env.JAVA_VERSION }} e rode:
+                </p>
+                <p><code>java -cp finance-app.jar org.example.Main</code></p>
+              </div>
+            </main>
+          </body>
+          </html>
+          EOF
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Publicar artifact do site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Executar deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
 
   notification:
     name: Notificacao
     runs-on: ubuntu-latest
-    needs: [ tests, build, deploy ]
+    needs: [tests, build, deploy]
     if: always()
+
     steps:
-      - name: Enviar E-mail via Action (Estável)
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.MAIL_USERNAME }}
-          password: ${{ secrets.MAIL_PASSWORD }}
-          to: ${{ secrets.EMAIL_DESTINO }}
-          from: "Pipeline NP1 Inatel"
-          subject: "Relatorio Pipeline C14 - Inatel"
-          priority: normal
-          body: |
-            A pipeline foi finalizada!
-            
-            Status dos Testes: ${{ needs.tests.result }}
-            Status do Build: ${{ needs.build.result }}
-            Status do Deploy: ${{ needs.deploy.result }}
-            
-            Confira os detalhes no link: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: Consolidar resultado final
+        env:
+          MAIL_USER: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASS: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_TO: ${{ secrets.EMAIL_DESTINO }}
+          TEST_STATUS: ${{ needs.tests.result }}
+          BUILD_STATUS: ${{ needs.build.result }}
+          DEPLOY_STATUS: ${{ needs.deploy.result }}
+          PAGE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: |
+          set -euo pipefail
+
+          MESSAGE="Pipeline finalizada. Testes: $TEST_STATUS | Build: $BUILD_STATUS | Deploy: $DEPLOY_STATUS"
+
+          if [ -n "${PAGE_URL:-}" ]; then
+            MESSAGE="$MESSAGE | URL do deploy: $PAGE_URL"
+          fi
+
+          echo "$MESSAGE"
+
+          {
+            echo "## Resultado final da pipeline"
+            echo ""
+            echo "- Testes: $TEST_STATUS"
+            echo "- Build: $BUILD_STATUS"
+            echo "- Deploy: $DEPLOY_STATUS"
+            if [ -n "${PAGE_URL:-}" ]; then
+              echo "- URL do deploy: $PAGE_URL"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -n "${MAIL_USER:-}" ] && [ -n "${MAIL_PASS:-}" ] && [ -n "${MAIL_TO:-}" ]; then
+            sudo apt-get update
+            sudo apt-get install -y swaks
+
+            swaks --server smtp.gmail.com --port 587 --auth LOGIN \
+              --auth-user "$MAIL_USER" --auth-password "$MAIL_PASS" \
+              --to "$MAIL_TO" \
+              --from "$MAIL_USER" \
+              --header "Subject: Relatorio Pipeline C14 - Inatel" \
+              --body "$MESSAGE" \
+              --tls
+          else
+            echo "Secrets de e-mail nao configurados. Resumo registrado no GitHub Actions."
+          fi
