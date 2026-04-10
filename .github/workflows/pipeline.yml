@@ -14,6 +14,8 @@ permissions:
 
 env:
   JAVA_VERSION: '22'
+  # Remove os avisos de depreciação do Node.js 20
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
   # Job 1: Testes Unitários
@@ -158,11 +160,11 @@ jobs:
           from: "Pipeline NP1 - Inatel"
           subject: "Relatorio Pipeline C14 - Inatel"
           body: |
-            Fala, equipe! A pipeline do FinanceApp terminou de rodar.
+            Chegou! Chegaram os relatórios da pipeline!!!
 
             Status Final:
-            - Testes: ${{ needs.tests.result }}
-            - Build: ${{ needs.build.result }}
-            - Deploy: ${{ needs.deploy.result }}
+            - [cite_start]Testes: ${{ needs.tests.result }} [cite: 22]
+            - [cite_start]Build: ${{ needs.build.result }} [cite: 22]
+            - [cite_start]Deploy: ${{ needs.deploy.result }} [cite: 65]
 
             Confira tudo no GitHub: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
